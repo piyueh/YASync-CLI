@@ -12,7 +12,7 @@ import logging
 import argparse
 import pathlib
 from . import __version__
-from .config import SyncthingConfig
+from . import subcommands
 
 def get_parser():
     """Get an argparse.ArgumentParser with arguments.
@@ -57,7 +57,35 @@ def get_parser():
     # add subcommand: show
     msg = "Show brief information obtained from config file."
     parser_show = subparsers.add_parser("show", description=msg, help=msg)
-    parser_show.set_defaults(func=lambda x: print(SyncthingConfig(x.config, x.url, x.apikey)))
+    parser_show.set_defaults(func=subcommands.show)
+
+    # add subcommand: get
+    msg = "Send a GET request to server. The is for debugging."
+    parser_get = subparsers.add_parser("get", description=msg, help=msg)
+    parser_get.set_defaults(func=subcommands.get)
+
+    msg = "The GET api endpoint. Options: %(choices)s. "
+    parser_get.add_argument(
+        "endpoint", action="store", type=str, metavar="ENDPOINT", help=msg,
+        choices=subcommands.SyncthingSession._get_apis)
+
+    parser_get.add_argument(
+        "args", action="store", type=str, metavar="ARGS", nargs=argparse.REMAINDER,
+        help="Parameters of the API endpoint.")
+
+    # add subcommand: post
+    msg = "Send a POST request to server. The is for debugging."
+    parser_post = subparsers.add_parser("post", description=msg, help=msg)
+    parser_post.set_defaults(func=subcommands.post)
+
+    msg = "The POST api endpoint. Options: %(choices)s. "
+    parser_post.add_argument(
+        "endpoint", action="store", type=str, metavar="ENDPOINT", help=msg,
+        choices=subcommands.SyncthingSession._post_apis)
+
+    parser_post.add_argument(
+        "args", action="store", type=str, metavar="ARGS", nargs=argparse.REMAINDER,
+        help="Parameters of the API endpoint.")
 
     return parser
 
