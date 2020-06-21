@@ -67,6 +67,7 @@ meta = dict(
     license="BSD 3-Clause License",
     include_package_data=True,
     entry_points={"console_scripts": ["yasync-cli = yasynccli.__main__:main"]},
+    tests_require=["pytest"],
 )
 
 # info from __init__.py
