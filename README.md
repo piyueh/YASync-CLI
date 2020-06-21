@@ -2,7 +2,7 @@ YASync-CLI -- Yet Another Syncthing CLI Tool
 ============================================
 
 YASync-CLI provides a command-line tool `yasync-cli` to manipulate a Syncthing
-daemon from terminal. It is supposed to be useful for headless servers.
+daemon from a terminal. It is supposed to be useful for headless servers.
 
 The project is still a WIP. Currently, I only add features when I need ones
 as I'm the only user. Feature requests are welcome. And feel free to test it.
@@ -12,7 +12,7 @@ as I'm the only user. Feature requests are welcome. And feel free to test it.
 ## Installation
 ---------------
 
-This is still a develop version. To install it to a local searchable path with
+This is still a developing version. To install it to a local searchable path with
 `pip`:
 
 ```
@@ -21,7 +21,7 @@ $ cd yasync-cli
 $ pip install --user .
 ```
 
-By default, an executable should be installed to `${HOME}/.local/bin/yasync-cli`.
+By default, the executable is installed at `${HOME}/.local/bin/yasync-cli`.
 If `${HOME}/.local/bin` is already in `PATH`, then the executable can be
 executed with `yasync-cli`. Alternatively, one can choose to use the full path
 to run the executable, i.e., `${HOME}/.local/bin/yasync-cli`.
@@ -62,23 +62,23 @@ Currently supported subcommands include: `show`, `get`, and `post`.
 $ yasync-cli show
 ```
 
-This will print very basic info of the configuration and the folders'
+This will print very basic info of the configuration and the monitored folders'
 information.
 
 
 ### GET and POST endpoints
 
-This tool also exposes subcommands to send GET and POST requests. For example,
-to rescan a Syncthing-monitoring folder (of which the ID is `abcde-12345`):
+`yasync-cli` also exposes subcommands to send GET and POST requests. For example,
+to rescan a monitored folder (of which the ID is `abcde-12345`):
 
 ```
 $ yasync-cli post /db/scan folder=abcde-12345
 ```
 
-And the folder ID can be obtained from `$ yasunc-cli show`.
+The folder ID can be obtained from the output of `$ yasunc-cli show`.
 
 The `get` and `post` subcommands are for debugging purpose only and for
-convenience.
+my convenience.
 
 
 ## Contact
