@@ -48,44 +48,67 @@ def create_fake_config(folder):
 
     return pathlib.Path(folder) / "test_config.xml"
 
-def test_SyncthingConfig_init_0():
+def test_SyncthingConfig_0():
     """Test init without giving a config file."""
     with pytest.raises(TypeError):
         config = module.SyncthingConfig()
 
-def test_SyncthingConfig_init_1():
+def test_SyncthingConfig_1():
     """Test init an invalid config file."""
     with pytest.raises(FileNotFoundError):
         config = module.SyncthingConfig("./abcdefg.xml")
 
-def test_SyncthingConfig_init_2(tmpdir):
+def test_SyncthingConfig_2(tmpdir):
     """Test init with a fake config file."""
     p = create_fake_config(tmpdir)
     config = module.SyncthingConfig(p)
-    assert config._config == p
-    assert config._url == "http://"+"192.168.1.1:9783"
-    assert config._apikey == "bMskdeWP293r7f8v3hdsTqwef"
+    assert config.config == p
+    assert config.url == "http://192.168.1.1:9783"
+    assert config.apikey == "bMskdeWP293r7f8v3hdsTqwef"
+    assert config.header == {"X-API-KEY": "bMskdeWP293r7f8v3hdsTqwef"}
 
-def test_SyncthingConfig_init_3(tmpdir):
+def test_SyncthingConfig_3(tmpdir):
     """Test init with a fake config file and url overwritten."""
     p = create_fake_config(tmpdir)
     config = module.SyncthingConfig(p, url="123.45.214.11:1234")
-    assert config._config == p
-    assert config._url == "http://"+"123.45.214.11:1234"
-    assert config._apikey == "bMskdeWP293r7f8v3hdsTqwef"
+    assert config.config == p
+    assert config.url == "http://123.45.214.11:1234"
+    assert config.apikey == "bMskdeWP293r7f8v3hdsTqwef"
 
-def test_SyncthingConfig_init_4(tmpdir):
+def test_SyncthingConfig_4(tmpdir):
     """Test init with a fake config file and api key overwritten."""
     p = create_fake_config(tmpdir)
     config = module.SyncthingConfig(p, apikey="nfekFKLE;Qfnklda2143e3")
-    assert config._config == p
-    assert config._url == "http://"+"192.168.1.1:9783"
-    assert config._apikey == "nfekFKLE;Qfnklda2143e3"
+    assert config.config == p
+    assert config.url == "http://192.168.1.1:9783"
+    assert config.apikey == "nfekFKLE;Qfnklda2143e3"
 
-def test_SyncthingConfig_init_5(tmpdir):
+def test_SyncthingConfig_5(tmpdir):
     """Test init with a fake config file and both url & api key overwritten."""
     p = create_fake_config(tmpdir)
     config = module.SyncthingConfig(p, "123.45.214.11:1234", "nekFKLEfnklda2143e3")
-    assert config._config == p
-    assert config._url == "http://"+"123.45.214.11:1234"
-    assert config._apikey == "nekFKLEfnklda2143e3"
+    assert config.config == p
+    assert config.url == "http://123.45.214.11:1234"
+    assert config.apikey == "nekFKLEfnklda2143e3"
+
+def test_SyncthingConfig_6(tmpdir):
+    """Test init with different URL formats."""
+    p = create_fake_config(tmpdir)
+
+    config = module.SyncthingConfig(p, url="//123.45.214.11:1234")
+    assert config.url == "http://123.45.214.11:1234"
+
+    config = module.SyncthingConfig(p, url="http://123.45.214.11:1234")
+    assert config.url == "http://123.45.214.11:1234"
+
+    config = module.SyncthingConfig(p, url="https://123.45.214.11:1234")
+    assert config.url == "https://123.45.214.11:1234"
+
+def test_SyncthingConfig_7(tmpdir):
+    """Test SyncthingConfig's endpoint method."""
+    p = create_fake_config(tmpdir)
+    config = module.SyncthingConfig(p, url="123.45.214.11:1234")
+
+    assert config.endpoint("system", "browse") == "http://123.45.214.11:1234/rest/system/browse"
+    assert config.endpoint("db", "scan") == "http://123.45.214.11:1234/rest/db/scan"
+

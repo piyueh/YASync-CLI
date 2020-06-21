@@ -8,6 +8,8 @@
 
 """Provides SyncthingConfig class.
 """
+import re
+import copy
 import pathlib
 import logging
 import xml.etree.ElementTree
@@ -49,7 +51,14 @@ class SyncthingConfig:
         # get url and apikey from GUI info
         gui = tree.find("gui")
         self._url = gui.find("address").text if url is None else url
-        self._url = "http://"+self._url if not self._url.startswith("http") else self._url
+
+        # to consider some possible ways to specify URL
+        pattern = r"(?://|(?P<proto>.*)://|)(?P<host>.*):(?P<port>\d+?)(?:$|/)"
+        match = re.search(pattern, self._url)
+        self._host, self._port = match.group("host"), match.group("port")
+        self._proto = "http" if match.group("proto") is None else match.group("proto")
+
+        # api key
         self._apikey = gui.find("apikey").text if apikey is None else apikey
 
         # get folders
@@ -70,16 +79,16 @@ class SyncthingConfig:
 
         s = "\n"
         s += col1.format("[Config path]") + "\n\n"
-        s += idnt + self._config + "\n"
+        s += idnt + str(self.config) + "\n"
 
         s += "\n"
         s += col1.format("[GUI info]") + "\n\n"
-        s += col1.format(idnt+"Address: ") + self._url + "\n"
-        s += col1.format(idnt+"API Key: ") + self._apikey + "\n"
+        s += col1.format(idnt+"Address: ") + self.url + "\n"
+        s += col1.format(idnt+"API Key: ") + self.apikey + "\n"
 
         s += "\n"
         s += col1.format("[Folders]") +"\n"
-        for key, value in self._folders.items():
+        for key, value in self.folders.items():
             s += "\n"
             s += col1.format(idnt+"- "+key) + "\n"
             s += "{}{}ID: {}\n".format(idnt, idnt, value["id"])
@@ -88,3 +97,35 @@ class SyncthingConfig:
         logger.debug("Done preparing __repr__ string")
 
         return s
+
+    @property
+    def config(self): # read-only attribute
+        """Path to the config file saved in this instance."""
+        return copy.deepcopy(self._config)
+
+    @property
+    def apikey(self): # read-only attribute
+        """API key saved in this instance."""
+        return copy.deepcopy(self._apikey)
+
+    @property
+    def folders(self): # read-only attribute
+        """Folders' info stored in this instance."""
+        return copy.deepcopy(self._folders)
+
+    @property
+    def header(self): # read-only attribute
+        """Header for HTTP requests to a Syncthing server."""
+        return {"X-API-KEY": self.apikey}
+
+    @property
+    def url(self, *args): # read-only attribute
+        """Syncthing GUI server address."""
+        return "{}://{}:{}".format(self._proto, self._host, self._port)
+
+    def endpoint(self, *args):
+        """HTTP REST base URL of the Syncthing server."""
+        address = self.url + "/rest"
+        for arg in args:
+            address += "/{}".format(arg)
+        return address
