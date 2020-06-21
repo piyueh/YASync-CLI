@@ -4,7 +4,15 @@ YASync-CLI -- Yet Another Syncthing CLI Tool
 YASync-CLI provides a command-line tool `yasync-cli` to manipulate a Syncthing
 daemon from a terminal. It is supposed to be useful for headless servers.
 
-The project is still a WIP. Currently, I only add features when I need ones
+Why another Syncthing CLI tool? Because I don't like other similar tools... And
+actually, not many such tools are still well maintained. To my best knowledge,
+the one that is well maintained and has complete features is
+[Syncthing Tray](https://github.com/Martchus/syncthingtray).
+However, Syncthing Tray does not separate its CLI tools and GUI components.
+So users have to installed all GUI components even if we only need the CLI tools,
+which is the reason I decided to work on my own CLI tools.
+
+This project is still a WIP. Currently, I only add features when I need ones
 as I'm the only user. Feature requests are welcome. And feel free to test it.
 `yasync-cli` has never been tested on other machines/systems.
 
