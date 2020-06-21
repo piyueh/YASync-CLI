@@ -89,7 +89,8 @@ class SyncthingSession(requests.Session):
         self._folders = {}
 
         for folder in tree.iterfind("folder"):
-            self._folders[folder.attrib["path"]] = {
+            p = pathlib.Path(folder.attrib["path"]).expanduser().resolve()
+            self._folders[p] = {
                 "label": folder.attrib["label"], "id": folder.attrib["id"]}
 
         # update attributes inhirented from the parent

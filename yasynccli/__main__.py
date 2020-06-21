@@ -59,6 +59,12 @@ def get_parser():
     parser_show = subparsers.add_parser("show", description=msg, help=msg)
     parser_show.set_defaults(func=subcommands.show)
 
+    # add subcommand: scan
+    msg = "Scan a directory/file to force synchronization."
+    parser_scan = subparsers.add_parser("scan", description=msg, help=msg)
+    parser_scan.set_defaults(func=subcommands.scan)
+    parser_scan.add_argument("path", action="store", type=str, metavar="PATH", help=msg)
+
     # add subcommand: get
     msg = "Send a GET request to server. The is for debugging."
     parser_get = subparsers.add_parser("get", description=msg, help=msg)
