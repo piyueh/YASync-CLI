@@ -69,7 +69,7 @@ or see the help of subcommands with
 $ yasync-cli <subcommand> --help
 ```
 
-Currently supported subcommands include: `show`, `scan`, `get`, and `post`.
+Currently supported subcommands include: `show`, `log`, `scan`, `get`, and `post`.
 
 
 ### 2. Show basic info in a configuration file

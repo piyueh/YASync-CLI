@@ -43,6 +43,13 @@ def show(subparser_action):
     return subparser_action, subparser
 
 @_add_docstring
+def log(subparser_action):
+    msg = "Show Syncthing server's log."
+    subparser = subparser_action.add_parser("log", description=msg, help=msg)
+    subparser.set_defaults(func=subcommands.log)
+    return subparser_action, subparser
+
+@_add_docstring
 def scan(subparser_action):
     msg = "Scan a directory/file to triger synchronization."
     subparser = subparser_action.add_parser("scan", description=msg, help=msg)

@@ -12,24 +12,38 @@ import re
 import pprint
 import pathlib
 from .session import SyncthingSession
+from . import formatters
 
-def show(args):
-    """Subcommand show.
+def _add_docstring(func):
+    """Add a docstring to a func and return it.
+
+    All functions in this module have very similar docstring, so we use a
+    factory to add docstrings.
+    """
+
+    func.__doc__ = \
+    """Entry of subcommand `{}`.
 
     Args:
     -----
         args: resulting namespace from parsing CMD arguments.
-    """
+    """.format(func.__name__)
 
+    return func
+
+@_add_docstring
+def show(args):
     print(SyncthingSession(args.config, args.url, args.apikey))
 
-def get(args):
-    """Subcommand get.
+@_add_docstring
+def log(args):
+    syncthing = SyncthingSession(args.config, args.url, args.apikey)
+    result = syncthing.get("system", "log", timeout=60).json()
+    string = formatters.log(result)
+    print(string)
 
-    Args:
-    -----
-        args: resulting namespace from parsing CMD arguments.
-    """
+@_add_docstring
+def get(args):
 
     params = {}
     for s in args.args:
@@ -39,13 +53,8 @@ def get(args):
     pprint.pprint(SyncthingSession(args.config, args.url, args.apikey).get(
         args.endpoint, timeout=60, params=params).json())
 
+@_add_docstring
 def post(args):
-    """Subcommand post.
-
-    Args:
-    -----
-        args: resulting namespace from parsing CMD arguments.
-    """
 
     params = {}
     for s in args.args:
@@ -56,13 +65,8 @@ def post(args):
         args.endpoint, timeout=60, params=params)
     response.raise_for_status()
 
+@_add_docstring
 def scan(args):
-    """Re-scan a folder/path.
-
-    Args:
-    -----
-        args: resulting namespace from parsing CMD arguments.
-    """
 
     params = dict(folder=None, sub=None)
 

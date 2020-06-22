@@ -78,6 +78,7 @@ def get_parser():
 
     # add subcommands' arguments
     subparsers, _ = arguments.show(subparsers)
+    subparsers, _ = arguments.log(subparsers)
     subparsers, _ = arguments.scan(subparsers)
     subparsers, _ = arguments.get(subparsers)
     subparsers, _ = arguments.post(subparsers)
