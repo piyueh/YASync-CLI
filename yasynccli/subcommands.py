@@ -8,10 +8,12 @@
 
 """Subcommand wrappers.
 """
+import sys
 import re
 import pprint
 import pathlib
 import logging
+import requests
 from .session import SyncthingSession
 from . import formatters
 
@@ -82,6 +84,31 @@ def scan(args):
     response = syncthing.post("db", "scan", timeout=60, params=params)
     response.raise_for_status()
     logger.debug("Done subcommand `{}`.".format("scan"))
+
+@_add_docstring
+def check(args):
+    logger.debug("Starting subcommand `{}`.".format("check"))
+    syncthing = SyncthingSession(args.config, args.url, args.apikey)
+
+    try:
+        response = syncthing.get("system", "config", timeout=60)
+        response.raise_for_status()
+
+    # server connection error
+    except requests.exceptions.ConnectionError:
+        sys.stderr.write("Error: couldn't connect to server at {}\n".format(syncthing.url))
+        sys.exit(1)
+
+    # server connected, but forbided our client
+    except requests.exceptions.HTTPError:
+        sys.stderr.write("Error: server refused the clint. Maybe check the API key?\n")
+        sys.exit(1)
+
+    config = response.json()
+    config["instance"] = syncthing # because formatters.check only takes one arg
+    formatters.check(config)
+
+    logger.debug("Done subcommand `{}`.".format("check"))
 
 @_add_docstring
 def get(args):

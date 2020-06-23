@@ -8,7 +8,9 @@
 
 """Formatters for JSON outputs of different subcommands.
 """
+import sys
 import re
+import pathlib
 
 def _add_docstring(func):
     """Add a docstring to a func and return it.
@@ -41,3 +43,35 @@ def log(data):
         date, time, tz = re.search(pattern, msg["when"]).groups()
         s += "{} {}{}: {}\n".format(date, time, tz, msg["message"])
     return s
+
+@_add_docstring
+def check(data):
+    config = data["instance"]
+    folders = config.folders
+    if len(data["folders"]) != len(folders):
+        raise RuntimeError(
+            "The config file has different number of monitored folders than "
+            "the actual running server does. "
+            "{} {}".format(len(data["devices"]), len(folders)))
+
+    for item in data["folders"]:
+        try:
+            path = pathlib.Path(item["path"]).expanduser().resolve()
+            target = folders[path]
+        except KeyError:
+            sys.stderr.write(
+                "Error: server has a folder {} not found ".format(path) +\
+                "in the configuration file {}\n".format(config.config))
+            sys.exit(1)
+
+        if item["id"] != target["id"]:
+            sys.stderr.write(
+                "Error: folder ID of {} mismatch: {} v.s. {}\n".format(
+                    path, item["id"], target["id"]))
+            sys.exit(1)
+
+        if item["label"] != target["label"]:
+            sys.stderr.write(
+                "Error: folder label of {} mismatch: {} v.s. {}\n".format(
+                    path, item["label"], target["label"]))
+            sys.exit(1)

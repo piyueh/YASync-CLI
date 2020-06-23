@@ -58,6 +58,13 @@ def scan(subparser_action):
     return subparser_action, subparser
 
 @_add_docstring
+def check(subparser_action):
+    msg = "Check if the configuration file matches the running server."
+    subparser = subparser_action.add_parser("check", description=msg, help=msg)
+    subparser.set_defaults(func=subcommands.check)
+    return subparser_action, subparser
+
+@_add_docstring
 def get(subparser_action):
     msg = "Send a GET request to server. This command is useful for debugging."
     subparser = subparser_action.add_parser("get", description=msg, help=msg)
