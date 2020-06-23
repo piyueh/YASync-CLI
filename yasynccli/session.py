@@ -16,7 +16,7 @@ import xml.etree.ElementTree
 import requests
 
 # get a logger with dummy handler if the caller does not have logging config
-logger = logging.getLogger("yasynccli.config")
+logger = logging.getLogger("yasynccli.session")
 logger.addHandler(logging.NullHandler())
 
 class SyncthingSession(requests.Session):
@@ -118,7 +118,7 @@ class SyncthingSession(requests.Session):
         s += col1.format("[Folders]") +"\n"
         for key, value in self.folders.items():
             s += "\n"
-            s += col1.format(idnt+"- "+key) + "\n"
+            s += col1.format(idnt+"- "+str(key)) + "\n"
             s += "{}{}ID: {}\n".format(idnt, idnt, value["id"])
             s += "{}{}Label: {}\n".format(idnt, idnt, value["label"])
 

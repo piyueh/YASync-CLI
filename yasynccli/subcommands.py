@@ -11,8 +11,13 @@
 import re
 import pprint
 import pathlib
+import logging
 from .session import SyncthingSession
 from . import formatters
+
+# get a logger with dummy handler if the caller does not have logging config
+logger = logging.getLogger("yasynccli.subcommands")
+logger.addHandler(logging.NullHandler())
 
 def _add_docstring(func):
     """Add a docstring to a func and return it.
@@ -37,36 +42,17 @@ def show(args):
 
 @_add_docstring
 def log(args):
+    logger.debug("Starting subcommand `{}`.".format("log"))
     syncthing = SyncthingSession(args.config, args.url, args.apikey)
-    result = syncthing.get("system", "log", timeout=60).json()
-    string = formatters.log(result)
+    result = syncthing.get("system", "log", timeout=60)
+    result.raise_for_status()
+    string = formatters.log(result.json())
+    logger.debug("Done subcommand `{}`.".format("log"))
     print(string)
 
 @_add_docstring
-def get(args):
-
-    params = {}
-    for s in args.args:
-        match = re.search(r"^(?P<key>.+?)=(?P<value>.+?)$", s)
-        params[match.group("key")] = match.group("value")
-
-    pprint.pprint(SyncthingSession(args.config, args.url, args.apikey).get(
-        args.endpoint, timeout=60, params=params).json())
-
-@_add_docstring
-def post(args):
-
-    params = {}
-    for s in args.args:
-        match = re.search(r"^(?P<key>.+?)=(?P<value>.+?)$", s)
-        params[match.group("key")] = match.group("value")
-
-    response = SyncthingSession(args.config, args.url, args.apikey).post(
-        args.endpoint, timeout=60, params=params)
-    response.raise_for_status()
-
-@_add_docstring
 def scan(args):
+    logger.debug("Starting subcommand `{}`.".format("scan"))
 
     params = dict(folder=None, sub=None)
 
@@ -95,3 +81,34 @@ def scan(args):
 
     response = syncthing.post("db", "scan", timeout=60, params=params)
     response.raise_for_status()
+    logger.debug("Done subcommand `{}`.".format("scan"))
+
+@_add_docstring
+def get(args):
+    logger.debug("Starting subcommand `{}`.".format("get"))
+
+    params = {}
+    for s in args.args:
+        match = re.search(r"^(?P<key>.+?)=(?P<value>.+?)$", s)
+        params[match.group("key")] = match.group("value")
+
+    response = SyncthingSession(args.config, args.url, args.apikey).get(
+        args.endpoint, timeout=60, params=params)
+    response.raise_for_status()
+
+    logger.debug("Done subcommand `{}`.".format("get"))
+    pprint.pprint(response.json())
+
+@_add_docstring
+def post(args):
+    logger.debug("Starting subcommand `{}`.".format("post"))
+
+    params = {}
+    for s in args.args:
+        match = re.search(r"^(?P<key>.+?)=(?P<value>.+?)$", s)
+        params[match.group("key")] = match.group("value")
+
+    response = SyncthingSession(args.config, args.url, args.apikey).post(
+        args.endpoint, timeout=60, params=params)
+    response.raise_for_status()
+    logger.debug("Done subcommand `{}`.".format("post"))
